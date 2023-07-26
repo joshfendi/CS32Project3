@@ -1,0 +1,361 @@
+Joshua Fendi
+805343353
+CS32 Project 3
+
+
+
+
+// Descripton of classes
+// BOARD CLASS
+- Used vector to represent the board
+    - index 0 == NORTH pot, goes counterclockwise until NORTH #1 hole
+    - this helped with the ease of accessing elements in the board since all of the holes and pots are connected in one vector
+
+// GAME CLASS
+- #include "Side.h"
+    - Initially I wrote everthing in long form which was very tedious and hard to read
+    - Using the opponent() function and the enumerations made everything easier to read and write
+
+// PLAYER CLASS
+- Base class
+    - Unless otherwise specified, when called, derived classes' isInteractive() returns false
+    - All derived classes use Player's constructor in their initialization lists to initialize the Player's m_name
+
+// HUMAN PLAYER CLASS
+- isInteractive() returns true
+- chooseMove() prompts users to enter their desired hole to sow
+
+// BAD PLAYER CLASS
+- chooseMove() chooses the first valid move
+    - looks through positions starting from hole #1 to the last hole until it finds a valid hole
+    - returns -1 if no possible move
+
+// SMART PLAYER CLASS
+- Used a game tree and recursion to acheive best move possible
+- private member functions
+	- chooseMoveHelper()
+		- purpose
+			- to make it possible to pass more variables during recursion than chooseMove() which only allows 2 arguments
+			- performs recursion to simulate plays and assign values to them
+	- evaluate()
+		- purpose
+			- to evaluate the board and assign it a value based on a heuristic
+				heuristic: "The greater the difference between the number of beans in my pot and the number in my opponent's, the better"
+- chooseMove()
+	- Since this function only allowed for 2 arguments, I created a private member function (chooseMoveHelper()) that I could pass those 2 arguments to (in
+	addition to other variables) to allow for recursion. Also as mentioned above, the heuristic I used to evaulate board positions is:
+	"The greater the difference between the number of beans in my pot and the number in my opponent's, the better"
+
+
+
+
+
+
+// PSEUDOCODE
+// Board.cpp
+- sow()
+    return false if (empty or invalid hole) or a pot
+    distribute beans counterclockwise from chosen hole
+    decrement beans inHand until ran out
+    when bean inHand ran out, set endSide and endHole
+    return true for a successful sow
+
+
+// Game.cpp
+- display()
+    print hole #s
+    print lines
+    print bean #s
+    print player names and pots
+    print bean #s
+    print line
+    print hole #s
+
+- move()
+    while(true) {
+        it is s's turn to move
+        if there are no possible moves
+            sweep the opponents beans into their pot
+            game ends 
+        else holes are not empty, there is at least 1 valid move
+            choose a hole to sow
+            display what hole the Player chose
+            if player lands in their own pot
+                they get another turn
+            else, check if there is a capture
+                if theres a capture
+                    move beans appropriately
+                break out of while loop to end turn
+    }
+
+- play() 
+    display intitial board
+    while(true) {
+        move current player
+        if player is not interactive 
+            cue users to press ENTER to continue
+        update status
+        if game is over
+            print if there is a winner or if theres a tie 
+        alternate current player and continue with while loop
+    }
+
+
+// Player.cpp
+- chooseMoveHelper()
+	if game over or depth is reached, return -1
+	
+	for all possible moves {
+		make self move
+
+		if landed in own pot
+			recurse with chooseMoveHelper
+		if there is a capture
+			move beans as needed
+
+		recurse with chooseMoveHelper to make opponent move
+
+		"unmake" self move
+
+		update maximum value
+
+		return bestHole;
+	}
+
+
+
+
+
+
+
+
+
+
+
+// DRAWBACKS
+    I initially thought that I did not have enough time to implement the SmartPlayer class properly, but I eventually
+	did it with very little time to spare. A problem that I had throughout the program was dealing with the difference
+	between '<' and '<='. One example for where '<=' would need to show up where I would mistakingly put '<' would be
+	when I am dealing with a for loop that goes through all the holes starting from i = 1 until i is no longer "<=" the
+	number of holes on one side of the board.
+
+
+// TEST CASSES 
+
+// 1
+    #include "Board.h"
+	#include "Side.h"
+
+	#include <iostream>
+	#include <cassert>
+	using namespace std;
+
+	void doBoardTests()
+	{
+	    Board b(3, 2);
+
+	    assert(
+        b.holes() == 3  // holes() works
+        &&  b.totalBeans() == 12  // totalBeans() works
+        && b.beans(SOUTH, POT) == 0   // beans() works
+        &&  
+        b.beansInPlay(SOUTH) == 6 // sum up all the beans
+        );
+
+	    b.setBeans(SOUTH, 1, 1); // setsBeans
+	    b.moveToPot(SOUTH, 2, SOUTH); // move all beans from hole to pot
+
+	    assert(b.totalBeans() == 11   // all beans in hole and pot
+        &&  b.beans(SOUTH, 1) == 1  // see if board arrangement is correct
+        &&  b.beans(SOUTH, 2) == 0  
+        &&  b.beans(SOUTH, POT) == 2  
+        &&  b.beansInPlay(SOUTH) == 3 // see if board arrangement is correct
+        );
+
+	    Side es;
+	    int eh;
+
+	    b.sow(SOUTH, 3, es, eh); // correctly distribute beans
+
+	    assert(es == NORTH  // correct end side
+        &&  eh == 3  // correct end hole
+        &&  b.beans(SOUTH, 3) == 0 // check for correct board arrangement
+        &&  b.beans(NORTH, 3) == 3  
+        &&  b.beans(SOUTH, POT) == 3  
+        &&  b.beansInPlay(SOUTH) == 1  // see if board arrangement is correct
+        &&  b.beansInPlay(NORTH) == 7  // see if board arrangement is correct
+        );
+	}
+
+	int main()
+	{
+	    doBoardTests();
+	    cout << "Passed all tests" << endl;
+	}
+
+
+// 2
+    #include "Player.h"
+	#include "Board.h"
+	#include "Side.h"
+	#include <iostream>
+	#include <cassert>
+	using namespace std;
+
+	void doPlayerTests()
+	{
+	    HumanPlayer hp("Marge");
+	    assert(hp.name() == "Marge"  &&  hp.isInteractive()); // name() works and isInteractive() should return true
+	    BadPlayer bp("Homer");
+	    assert(bp.name() == "Homer"  &&  !bp.isInteractive()); // name() works and isInteractive() should return false
+	    SmartPlayer sp("Lisa");
+	    assert(sp.name() == "Lisa"  &&  !sp.isInteractive()); // name() works and isInteractive() should return false
+	    Board b(3, 2);
+	    b.setBeans(SOUTH, 2, 0); // set correct hole with correct amount of beans
+	    cout << "=========" << endl;
+	    int n = hp.chooseMove(b, SOUTH); // dont print out anything else besides something to get Marge's hole choice
+	    cout << "=========" << endl;
+	    assert(n == 1  ||  n == 3); // assert that human player chooses either 1 or 3 hole
+	    n = bp.chooseMove(b, SOUTH); // bad player has to either choose 1 or 3 hole
+	    assert(n == 1  ||  n == 3);
+	    n = sp.chooseMove(b, SOUTH); // smart player has to either choose 1 or 3 hole
+	    assert(n == 1  ||  n == 3);
+	}
+
+	int main()
+	{
+	    doPlayerTests();
+	    cout << "Passed all tests" << endl;
+	}
+
+
+// 3
+    #include "Game.h"
+	#include "Player.h"
+	#include "Board.h"
+	#include "Side.h"
+	#include <iostream>
+	#include <cassert>
+	using namespace std;
+
+	void doGameTests()
+	{
+	    BadPlayer bp1("Bart");
+	    BadPlayer bp2("Homer");
+	    Board b(3, 0); // # of initial beans can be 0
+	    b.setBeans(SOUTH, 1, 2); // make sure set works
+	    b.setBeans(NORTH, 2, 1);
+	    b.setBeans(NORTH, 3, 2);
+	    Game g(b, &bp1, &bp2); // create game
+	    bool over;
+	    bool hasWinner;
+	    Side winner;
+	      //    Homer
+	      //   0  1  2
+	      // 0         0
+	      //   2  0  0
+	      //    Bart
+
+        // status is able to manipulate over hasWinner and winner
+	    g.status(over, hasWinner, winner); 
+	    assert(
+            !over
+            && g.beans(NORTH, POT) == 0  // check the position of beans. beans() works
+            && g.beans(SOUTH, POT) == 0 
+            && g.beans(NORTH, 1) == 0 
+            && g.beans(NORTH, 2) == 1 
+            && g.beans(NORTH, 3) == 2 
+            && g.beans(SOUTH, 1) == 2 
+            && g.beans(SOUTH, 2) == 0 
+            && g.beans(SOUTH, 3) == 0
+        );
+
+// move works
+	    g.move(SOUTH);
+	      //   0  1  0
+	      // 0         3
+	      //   0  1  0
+    
+	    g.status(over, hasWinner, winner);
+	    assert(!over && g.beans(NORTH, POT) == 0 && g.beans(SOUTH, POT) == 3 &&
+		g.beans(NORTH, 1) == 0 && g.beans(NORTH, 2) == 1 && g.beans(NORTH, 3) == 0 &&
+		g.beans(SOUTH, 1) == 0 && g.beans(SOUTH, 2) == 1 && g.beans(SOUTH, 3) == 0);
+
+	    g.move(NORTH);
+	      //   1  0  0
+	      // 0         3
+	      //   0  1  0
+	    g.status(over, hasWinner, winner);
+	    assert(!over && g.beans(NORTH, POT) == 0 && g.beans(SOUTH, POT) == 3 &&
+		g.beans(NORTH, 1) == 1 && g.beans(NORTH, 2) == 0 && g.beans(NORTH, 3) == 0 &&
+		g.beans(SOUTH, 1) == 0 && g.beans(SOUTH, 2) == 1 && g.beans(SOUTH, 3) == 0);
+
+	    g.move(SOUTH);
+	      //   1  0  0
+	      // 0         3
+	      //   0  0  1
+	    g.status(over, hasWinner, winner);
+	    assert(!over && g.beans(NORTH, POT) == 0 && g.beans(SOUTH, POT) == 3 &&
+		g.beans(NORTH, 1) == 1 && g.beans(NORTH, 2) == 0 && g.beans(NORTH, 3) == 0 &&
+		g.beans(SOUTH, 1) == 0 && g.beans(SOUTH, 2) == 0 && g.beans(SOUTH, 3) == 1);
+
+	    g.move(NORTH);
+	      //   0  0  0
+	      // 1         4
+	      //   0  0  0
+        
+
+        // correctly says that game is over and correctly says that Bart is winner and the game has a winner
+	    g.status(over, hasWinner, winner); 
+
+	    assert(
+            over 
+        && g.beans(NORTH, POT) == 1 
+        && g.beans(SOUTH, POT) == 4 
+        && g.beans(NORTH, 1) == 0 
+        && g.beans(NORTH, 2) == 0 
+        && g.beans(NORTH, 3) == 0 
+        && g.beans(SOUTH, 1) == 0 
+        && g.beans(SOUTH, 2) == 0 
+        && g.beans(SOUTH, 3) == 0
+        );
+	    assert(hasWinner && winner == SOUTH); 
+	}
+
+	int main()
+	{
+	    doGameTests();
+	    cout << "Passed all tests" << endl;
+	}
+
+
+
+
+
+// 4
+// assume all necessary includes are here 
+    number_of_holes = 2;
+    int beans_per_hole = 1;
+
+    Board myBoard(number_of_holes, beans_per_hole);
+    assert(myBoard.initialBeansPerHole() == 1); // initialBeansPerHole works
+
+
+    BadPlayer hp1("Bad1");
+    SmartPlayer hp2("Smart2");
+    Game my_game(myBoard, &hp1, &hp2);
+
+    my_game.display(); // display current game
+    my_game.play(); // play the game
+
+    assert(opponent(SOUTH) == NORTH); // opponent() function works, returns opponent
+
+	hp2.evaluate(myBoard,SOUTH); // would correclty evaluate the current difference of the pots
+
+
+
+
+    
+
+
+
