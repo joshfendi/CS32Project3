@@ -18,7 +18,7 @@ Welcome to the **Mancala** repository! In this project, I have implemented a pla
 
 List the main features of your project.
 
-- User vs. Smart Player: A user plays against the Smart Player. A Smart Player chooses moves strategically 
+- User vs. Smart Player: A user plays against the Smart Player. A Smart Player chooses moves by recursively searching game trees to strategize and determine optimal moves
 - User vs. Bad Player: A user plays against the Bad Player. A Bad Player chooses moves randomly
 - User vs. User (Classic Mancala): 2 users play against each other
 
