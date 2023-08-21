@@ -18,17 +18,16 @@ int main()
 
     Board myBoard(number_of_holes, beans_per_hole);
 
-    // HumanPlayer hp1("Josh");
-    // HumanPlayer hp2("Chloe");
-//    BadPlayer hp2("Computer");
-   BadPlayer hp1("Bad2");
-    // SmartPlayer hp1("Smart1");
-   SmartPlayer hp2("Computer");
-    // int num = hp1.chooseMove(myBoard,SOUTH);
-    // cout << "num sowed: " << num << endl;14
-    // cout << "hole: " << myBoard.beans(NORTH,3) << endl;
+    HumanPlayer player1("Human 1");
 
-    Game my_game(myBoard, &hp1, &hp2);
+// Player 2
+   SmartPlayer player2("Smart Player");
+//  BadPlayer player2("Bad Player");
+//  HumanPlayer player2("Human 2");
+
+    
+
+    Game my_game(myBoard, &player1, &player2);
     my_game.play();
 }
 
