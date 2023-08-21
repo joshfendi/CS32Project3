@@ -3,12 +3,6 @@
 #include "Player.h"
 #include "Game.h"
 
-// DELETEEEE_------------------------------------------------------------------------------
-#include "Board.cpp"
-#include "Player.cpp"
-#include "Game.cpp"
-// DELETEEEE_------------------------------------------------------------------------------
-
 using namespace std;
 
 int main()
