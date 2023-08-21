@@ -33,7 +33,7 @@ Step-by-step instructions on how to install and set up the project.
 
 ## Usage
 
-Once you have the project opened, navigate to the file Main.cpp. Depending on what type of opponent you would like to play against, only ONE of the following lines should be uncommented a once: line 24, line 25, or line 26. Here, you have the choice of whether you want to play against a 1) Smart Player, 2) Bad Player, or 3) Human.
+Once you have the project opened, navigate to the file Main.cpp. Depending on what type of opponent you would like to play against, only ONE of the following lines should be uncommented a once: line 18, line 19, or line 20. Here, you have the choice of whether you want to play against a 1) Smart Player, 2) Bad Player, or 3) Human.
 
 You do not need to edit anything else. All that is left to do is open up a new terminal, run the code, and have fun!
 
