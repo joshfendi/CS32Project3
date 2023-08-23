@@ -16,20 +16,15 @@ Welcome to the **Mancala** repository! In this project, I have implemented a pla
 
 ## Features
 
-List the main features of your project.
-
 - User vs. Smart Player: A user plays against the Smart Player. A Smart Player chooses moves by recursively searching game trees to strategize and determine optimal moves
 - User vs. Bad Player: A user plays against the Bad Player. A Bad Player chooses moves randomly
 - User vs. User (Classic Mancala): 2 users play against each other
 
 ## Installation
 
-Step-by-step instructions on how to install and set up the project.
-
-1. Clone the repository: `git clone https://github.com/your-username/your-repo.git`
-2. Navigate to the project directory: `cd your-repo`
+1. Clone the repository: `git clone https://github.com/joshfendi/Mancala`
+2. Navigate to the project directory: `cd Mancala`
 3. Install dependencies: `npm install`
-4. Configuration steps, if any.
 
 ## Usage
 
